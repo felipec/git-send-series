@@ -1,0 +1,88 @@
+#!/usr/bin/env ruby
+
+require 'fileutils'
+require 'yaml'
+
+BASE_DIR = "~/.config/git/patch-series/"
+
+branches = ARGV
+
+class Branch
+
+  attr_reader :id, :summary, :body, :prefix
+
+  def initialize(name)
+    @name = name
+    @id = name.tr('/', '-')
+    @file = File.expand_path(File.join(BASE_DIR, @id + '.txt'))
+
+    raise "Missing #{name}" unless File.readable?(@file)
+    header, @cover = File.read(@file).split("\n\n", 2)
+    @data = YAML.load(header)
+    @summary, @body = @cover.split("\n\n", 2)
+
+    try = self['try']
+    version = self['version']
+    prefix = [ self['rfc'] ? 'RFC/PATCH' : 'PATCH' ]
+    prefix << "v#{version}" if version
+    prefix << "try#{try}" if try
+    @prefix = prefix.join(' ')
+  end
+
+  def [](name)
+    @data[name]
+  end
+
+  def []=(name, v)
+    @data[name] = v
+  end
+
+  def store
+    header = @data.to_yaml[4..-1]
+    File.write(@file, header + "\n" + @cover)
+  end
+
+end
+
+branches.each do |name|
+  branch = Branch.new(name)
+
+  extra = []
+  extra << "--subject-prefix=#{branch.prefix}"
+  extra << "--notes"
+
+  FileUtils.rm_rf(branch.id)
+  system('git', 'format-patch', '--quiet', '-C', '-o', branch.id, *extra, "^#{name}@{upstream}", name)
+
+  Dir.glob("#{branch.id}/*0000-cover-letter.patch").each do |fn|
+    content = File.read(fn)
+    content.gsub!('*** SUBJECT HERE ***', branch.summary)
+    content.gsub!('*** BLURB HERE ***', branch.body)
+    File.write(fn, content)
+  end
+
+  extra = []
+  extra += ['--no-annotate']
+
+  cc = branch['cc']
+  extra += cc.chomp.split(', ').map { |e| ['--cc', e] }.flatten if cc
+
+  patches = Dir.glob("#{branch.id}/*.patch").sort
+  mid = nil
+  IO.popen(['git', 'send-email'] + extra + patches) do |io|
+    io.each do |l|
+      case l
+      when /^Subject: (.*)$/
+        puts "Sent #{$1}"
+      when /^Message-Id: <(.*)>$/
+        mid ||= $1
+      end
+    end
+  end
+
+  system('git', 'update-ref', '-m', 'sent version',
+         'refs/sent/%s/v%s' % [name, branch['version'] || 1], name)
+
+  branch['mid'] = mid
+  branch.store
+end
