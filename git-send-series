@@ -44,6 +44,8 @@ class Branch
 
 end
 
+branches << `git rev-parse --symbolic-full-name HEAD`.chomp.sub(%r{^refs/heads/}, '') if branches.empty?
+
 branches.each do |name|
   branch = Branch.new(name)
 
