@@ -21,7 +21,7 @@ class Branch
   def parse
     raise "Missing #{name}" unless File.readable?(@file)
     header, @cover = File.read(@file).split("\n\n", 2)
-    @data = YAML.load(header)
+    @data = YAML.load(header) || {}
     @summary, @body = @cover.split("\n\n", 2)
 
     try = self['try']
