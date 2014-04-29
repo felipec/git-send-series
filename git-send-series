@@ -16,7 +16,9 @@ class Branch
     @name = name
     @id = name.tr('/', '-')
     @file = File.expand_path(File.join(BASE_DIR, @id + '.txt'))
+  end
 
+  def parse
     raise "Missing #{name}" unless File.readable?(@file)
     header, @cover = File.read(@file).split("\n\n", 2)
     @data = YAML.load(header)
@@ -136,6 +138,8 @@ branches.each do |name|
     system(*editor, branch.file)
     next
   end
+
+  branch.parse
 
   extra = []
   extra << "--subject-prefix=#{branch.prefix}"
