@@ -146,7 +146,7 @@ branches.each do |name|
   extra << "--notes"
 
   FileUtils.rm_rf(branch.id)
-  system('git', 'format-patch', '--quiet', '-C', '-o', branch.id, *extra, "^#{name}@{upstream}", name)
+  system('git', 'format-patch', '--quiet', '--cover-letter', '-C', '-o', branch.id, *extra, "^#{name}@{upstream}", name)
 
   Dir.glob("#{branch.id}/*0000-cover-letter.patch").each do |fn|
     content = File.read(fn)
