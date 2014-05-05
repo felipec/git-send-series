@@ -35,8 +35,8 @@ test_expect_success 'setup' '
 
 test_expect_success 'simple send' '
 	test_when_finished "rm -f actual" &&
-	mkdir -p "$HOME"/.config/git/patch-series/ &&
-	cat > "$HOME"/.config/git/patch-series/topic.txt <<-\EOF &&
+	mkdir -p .git/series/ &&
+	cat > .git/series/topic <<-\EOF &&
 	version: 1
 
 	Summary

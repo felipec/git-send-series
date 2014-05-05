@@ -3,9 +3,10 @@
 require 'fileutils'
 require 'yaml'
 
-BASE_DIR = "~/.config/git/patch-series/"
-
 branches = ARGV
+
+$git_dir = %x[git rev-parse --git-dir].chomp
+$base_dir = File.join($git_dir, 'series')
 
 def die(*args)
   fmt = args.shift
@@ -21,7 +22,7 @@ class Branch
   def initialize(name)
     @name = name
     @id = name.tr('/', '-')
-    @file = File.expand_path(File.join(BASE_DIR, @id + '.txt'))
+    @file = File.expand_path(File.join($base_dir, @id))
   end
 
   def parse
