@@ -53,9 +53,15 @@ class Branch
 
   def parse
     edit
-    header, @cover = File.read(@file).split("\n\n", 2)
-    @data = YAML.load(header) || {}
-    @summary, @body = @cover.split("\n\n", 2)
+
+    begin
+      header, @cover = File.read(@file).split("\n\n", 2)
+      @data = YAML.load(header) || {}
+      @summary, @body = @cover.split("\n\n", 2)
+    rescue
+      $stderr.puts 'Parsing error'
+      exit 1
+    end
 
     try = self['try']
     version = self['version']
