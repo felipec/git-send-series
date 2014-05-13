@@ -53,4 +53,27 @@ test_expect_success 'simple send' '
 	test_cmp expected actual
 '
 
+test_expect_success 'edit and send' '
+	test_when_finished "rm -f actual" &&
+	cat > editor <<-\EOS &&
+		#!/bin/sh
+		cat > "$1" <<EOF
+		version: 2
+
+		Summary
+
+		Description.
+		EOF
+	EOS
+	chmod +x editor &&
+	EDITOR=./editor git send-series &&
+	cat > expected <<-EOF &&
+	Subject: [PATCH v2 0/3] Summary
+	Subject: [PATCH v2 1/3] one
+	Subject: [PATCH v2 2/3] two
+	Subject: [PATCH v2 3/3] three
+	EOF
+	test_cmp expected actual
+'
+
 test_done

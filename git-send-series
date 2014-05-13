@@ -8,6 +8,15 @@ branches = ARGV
 $git_dir = %x[git rev-parse --git-dir].chomp
 $base_dir = File.join($git_dir, 'series')
 
+$template = <<EOF
+version:
+cc:
+
+Subject
+
+Content.
+EOF
+
 def die(*args)
   fmt = args.shift
   $stderr.printf("fatal: %s\n" % fmt, *args)
@@ -25,8 +34,17 @@ class Branch
     @file = File.expand_path(File.join($base_dir, @id))
   end
 
+  def edit
+    if not File.exists?(@file)
+      FileUtils.mkdir_p($base_dir)
+      File.write(@file, $template)
+    end
+    editor = %x[git var GIT_EDITOR].chomp.split(' ')
+    system(*editor, @file)
+  end
+
   def parse
-    die "Missing #{@name}" unless File.readable?(@file)
+    edit
     header, @cover = File.read(@file).split("\n\n", 2)
     @data = YAML.load(header) || {}
     @summary, @body = @cover.split("\n\n", 2)
@@ -141,8 +159,7 @@ branches.each do |name|
   branch = Branch.new(name)
 
   if $edit
-    editor = %x[git var GIT_EDITOR].chomp.split(' ')
-    system(*editor, branch.file)
+    branch.edit
     next
   end
 
