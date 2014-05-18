@@ -8,7 +8,7 @@
 
 test_description='Test basic functionality'
 
-. ./sharness.sh
+. ./test-lib.sh
 
 do_commit () {
 	local filename="$1"
