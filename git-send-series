@@ -196,6 +196,9 @@ branches.each do |name|
   extra = []
   extra += ['--no-annotate']
 
+  to = branch['to']
+  extra += to.chomp.split(', ').map { |e| ['--to', e] }.flatten if to
+
   cc = branch['cc']
   extra += cc.chomp.split(', ').map { |e| ['--cc', e] }.flatten if cc
 
