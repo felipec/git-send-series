@@ -1,5 +1,9 @@
 language: ruby
 
+before_install:
+  - sudo apt-get update -q
+  - sudo apt-get install -q git-email
+
 script:
   - make test
 
