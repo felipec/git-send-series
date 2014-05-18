@@ -1,0 +1,31 @@
+= git-send-series =
+
+This tool allows you to maintain a patch series more easily. You can store the
+cover letter, the cc list, version of the series, and other metadata.
+
+By default it will use the currently checked out branch, and show you a template like this:
+
+------------
+version:
+cc:
+
+Subject
+
+Content.
+------------
+
+The first part is a YAML document with all optional fields, such as 'version',
+'cc', 'to'. You can store any information you want using the YAML syntax.
+
+The second part, delimited by a blank line, is the cover letter. The first like
+will be used as the subject of the cover letter email, and the rest as the
+content of the email.
+
+Then standard tools will be used to send the emails: `git format-patch` and
+`git send-email`, which you must have configured before using this helper.
+
+In the end a custom ref will be created to save the current state of the
+branch. For example, if you want to see what was the status of your series of
+the branch 'feature-a' in version 2, you can use 'sent/feature-a/v2', for
+example to create an interdiff to see what changed between one version an the
+other.
