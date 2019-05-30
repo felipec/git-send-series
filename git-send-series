@@ -46,7 +46,7 @@ class Branch
     @tmp_file.write(File.read(@file))
     @tmp_file.close
     system(*editor, @tmp_file.path)
-    exit 1 if @tmp_file.size == 0
+    exit 1 if @tmp_file.size.to_i == 0 # Workaround for Ruby bug #13198
     File.write(@file, File.read(@tmp_file))
     @tmp_file.unlink
   end
