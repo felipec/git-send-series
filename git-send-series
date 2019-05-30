@@ -8,6 +8,7 @@ branches = ARGV
 
 $git_dir = %x[git rev-parse --git-dir].chomp
 $base_dir = File.join($git_dir, 'series')
+$edit = false
 
 $template = <<EOF
 version:
@@ -37,7 +38,7 @@ class Branch
   end
 
   def edit
-    if not File.exists?(@file)
+    if not File.exist?(@file)
       FileUtils.mkdir_p($base_dir)
       File.write(@file, $template)
     end
