@@ -3,7 +3,8 @@
 This tool allows you to maintain a patch series more easily. You can store the
 cover letter, the cc list, version of the series, and other metadata.
 
-By default it will use the currently checked out branch, and show you a template like this:
+By default it will use the currently checked out branch, and show you a
+template like this:
 
 ------------
 version:
