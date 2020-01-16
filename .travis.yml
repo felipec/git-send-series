@@ -1,8 +1,12 @@
 language: ruby
 
-before_install:
-  - sudo apt-get update -q
-  - sudo apt-get install -q git-email
+addons:
+  apt:
+    sources:
+      - git-core
+    packages:
+      - libmailtools-perl
+      - git-email
 
 script:
   - make test
