@@ -189,7 +189,7 @@ branches.each do |name|
   Dir.glob("#{branch.id}/*0000-cover-letter.patch").each do |fn|
     content = File.read(fn)
     content.gsub!('*** SUBJECT HERE ***', branch.summary)
-    content.gsub!('*** BLURB HERE ***', branch.body)
+    content.gsub!('*** BLURB HERE ***', branch.body.chomp)
     File.write(fn, content)
   end
 
