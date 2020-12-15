@@ -220,4 +220,6 @@ branches.each do |name|
 
   branch['mid'] = mid
   branch.store
+
+  FileUtils.rm_rf(branch.id)
 end
