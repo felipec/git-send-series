@@ -53,8 +53,6 @@ class Branch
   end
 
   def parse
-    edit
-
     begin
       header, @cover = File.read(@file).split("\n\n", 2)
       @data = YAML.load(header) || {}
@@ -178,6 +176,7 @@ branches.each do |name|
     next
   end
 
+  branch.edit
   branch.parse
 
   extra = []
