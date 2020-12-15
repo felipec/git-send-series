@@ -168,6 +168,11 @@ opts.parse
 
 branches << `git name-rev --name-only HEAD`.chomp if branches.empty?
 
+def get_sent(name, v)
+  ref = 'refs/sent/%s/v%d' % [name, v]
+  system('git', 'rev-parse', '-q', '--verify', ref, err: File::NULL, out: File::NULL) ? ref : nil
+end
+
 branches.each do |name|
   branch = Branch.new(name)
 
@@ -178,10 +183,16 @@ branches.each do |name|
 
   branch.edit
   branch.parse
+  previous = nil
+
+  if branch['version']
+    previous = get_sent(name, branch['version'] - 1)
+  end
 
   extra = []
   extra << "--subject-prefix=#{branch.prefix}"
   extra << "--notes"
+  extra << "--range-diff=#{previous}" if previous
 
   FileUtils.rm_rf(branch.id)
   system('git', 'format-patch', '--quiet', '--cover-letter', '-C', '-D', '-o', branch.id, *extra, "^#{name}@{upstream}", name)
