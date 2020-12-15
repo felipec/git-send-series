@@ -186,6 +186,9 @@ branches.each do |name|
   previous = nil
 
   if branch['version']
+    if get_sent(name, branch['version'])
+      die "Already sent v%d" % branch['version']
+    end
     previous = get_sent(name, branch['version'] - 1)
   end
 
@@ -226,8 +229,10 @@ branches.each do |name|
     end
   end
 
+  branch['version'] ||= 1
+
   system('git', 'update-ref', '-m', 'sent version',
-         'refs/sent/%s/v%s' % [name, branch['version'] || 1], name)
+         'refs/sent/%s/v%s' % [name, branch['version']], name)
 
   branch['mid'] = mid
   branch.store

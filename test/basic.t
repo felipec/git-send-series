@@ -44,6 +44,7 @@ test_expect_success 'simple send' '
 	Description.
 	EOF
 	git send-series &&
+	test_when_finished "git update-ref -d refs/sent/topic/v1" &&
 	cat > expected <<-EOF &&
 	Subject: [PATCH v1 0/3] Summary
 	Subject: [PATCH v1 1/3] one
@@ -67,6 +68,7 @@ test_expect_success 'edit and send' '
 	EOS
 	chmod +x editor &&
 	EDITOR=./editor git send-series &&
+	test_when_finished "git update-ref -d refs/sent/topic/v2" &&
 	cat > expected <<-EOF &&
 	Subject: [PATCH v2 0/3] Summary
 	Subject: [PATCH v2 1/3] one
@@ -85,6 +87,37 @@ test_expect_success 'cancel edit' '
 	chmod +x editor &&
 	test_must_fail env EDITOR=./editor git send-series &&
 	test -s .git/series/topic
+'
+
+test_expect_success 'multiple send' '
+	test_when_finished "rm -f actual" &&
+	mkdir -p .git/series/ &&
+
+	cat > .git/series/topic <<-\EOF &&
+	version:
+
+	Summary
+
+	Description.
+	EOF
+	git send-series &&
+	test_when_finished "git update-ref -d refs/sent/topic/v1" &&
+
+	do_commit four &&
+	test_must_fail git send-series &&
+
+	sed -i "s/version: 1/version: 2/" .git/series/topic &&
+	> actual &&
+	git send-series &&
+	test_when_finished "git update-ref -d refs/sent/topic/v2" &&
+	cat > expected <<-EOF &&
+	Subject: [PATCH v2 0/4] Summary
+	Subject: [PATCH v2 1/4] one
+	Subject: [PATCH v2 2/4] two
+	Subject: [PATCH v2 3/4] three
+	Subject: [PATCH v2 4/4] four
+	EOF
+	test_cmp expected actual
 '
 
 test_done
