@@ -10,6 +10,7 @@ $git_dir = %x[git rev-parse --git-dir].chomp
 $base_dir = File.join($git_dir, 'series')
 $edit = false
 $dry_run = false
+$show_cover = false
 
 $template = <<EOF
 version:
@@ -173,6 +174,10 @@ opts.on('d', 'dry-run', 'Do a dry run') do |v|
   $dry_run = true
 end
 
+opts.on('s', 'show', 'Show cover-letter before sending') do |v|
+  $show_cover = true
+end
+
 opts.parse
 
 branches << `git name-rev --name-only HEAD`.chomp if branches.empty?
@@ -214,6 +219,7 @@ branches.each do |name|
     content.gsub!('*** SUBJECT HERE ***', branch.summary)
     content.gsub!('*** BLURB HERE ***', branch.body.chomp(''))
     File.write(fn, content)
+    run_editor(fn) if $show_cover
   end
 
   next if $dry_run
