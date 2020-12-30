@@ -34,7 +34,8 @@ end
 
 class Branch
 
-  attr_reader :id, :summary, :body, :prefix
+  attr_reader :id, :summary, :body
+  attr_reader :version, :rfc, :prefix
   attr_reader :file
 
   def initialize(name)
@@ -68,12 +69,13 @@ class Branch
       exit 1
     end
 
-    try = self['try']
-    version = self['version']
-    prefix = [ self['rfc'] ? 'RFC/PATCH' : 'PATCH' ]
-    prefix << "v#{version}" if version
-    prefix << "try#{try}" if try
-    @prefix = prefix.join(' ')
+    @version = self['version']
+    @rfc = self['rfc']
+    if self['try']
+      prefix = [ @rfc ? 'RFC/PATCH' : 'PATCH' ]
+      prefix << "try" + self['try']
+      @prefix = prefix.join(' ')
+    end
   end
 
   def [](name)
@@ -207,7 +209,12 @@ branches.each do |name|
   end
 
   extra = []
-  extra << "--subject-prefix=#{branch.prefix}"
+  if branch.prefix
+    extra << "--subject-prefix=#{branch.prefix}"
+  else
+    extra << "--rfc=#{branch.rfc}" if branch.rfc
+    extra << "--reroll-count=#{branch.version}" if branch.version
+  end
   extra << "--notes"
   extra << "--range-diff=#{previous}" if previous
 
