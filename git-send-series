@@ -208,6 +208,8 @@ branches.each do |name|
   branch.parse
   previous_rev = nil
 
+  rev = "#{name}@{upstream}..#{name}"
+
   if branch.version
     if get_sent(name, branch.version)
       die "Already sent v%d" % branch.version
@@ -228,7 +230,7 @@ branches.each do |name|
   extra << "--range-diff=#{previous_rev}" if previous_rev
 
   FileUtils.rm_rf(branch.id)
-  system('git', 'format-patch', '--quiet', '--cover-letter', '-C', '-D', '-o', branch.id, *extra, "^#{name}@{upstream}", name)
+  system('git', 'format-patch', '--quiet', '--cover-letter', '-C', '-D', '-o', branch.id, *extra, rev)
 
   Dir.glob("#{branch.id}/*0000-cover-letter.patch").each do |fn|
     content = File.read(fn)
