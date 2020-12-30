@@ -9,6 +9,7 @@ branches = ARGV
 $git_dir = %x[git rev-parse --git-dir].chomp
 $base_dir = File.join($git_dir, 'series')
 $edit = false
+$dry_run = false
 
 $template = <<EOF
 version:
@@ -164,6 +165,10 @@ opts.on('e', 'edit', 'Edit the branch information') do |v|
   $edit = true
 end
 
+opts.on('d', 'dry-run', 'Do a dry run') do |v|
+  $dry_run = true
+end
+
 opts.parse
 
 branches << `git name-rev --name-only HEAD`.chomp if branches.empty?
@@ -206,6 +211,8 @@ branches.each do |name|
     content.gsub!('*** BLURB HERE ***', branch.body.chomp(''))
     File.write(fn, content)
   end
+
+  next if $dry_run
 
   extra = []
   extra += ['--no-annotate']
