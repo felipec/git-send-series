@@ -26,6 +26,11 @@ def die(*args)
   exit 128
 end
 
+def run_editor(file)
+  editor = %x[git var GIT_EDITOR].chomp.split(' ')
+  exit 1 unless system(*editor, file)
+end
+
 class Branch
 
   attr_reader :id, :summary, :body, :prefix
@@ -43,12 +48,11 @@ class Branch
       FileUtils.mkdir_p($base_dir)
       File.write(@file, $template)
     end
-    editor = %x[git var GIT_EDITOR].chomp.split(' ')
     @tmp_file = Tempfile.new('git-send-series')
     @tmp_file.write(File.read(@file))
     @tmp_file.close
-    system(*editor, @tmp_file.path)
-    exit 1 if (!$?.success? || @tmp_file.size == 0)
+    run_editor(@tmp_file.path)
+    exit 1 if @tmp_file.size == 0
     File.write(@file, File.read(@tmp_file))
     @tmp_file.unlink
   end
