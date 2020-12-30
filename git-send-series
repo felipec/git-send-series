@@ -191,8 +191,8 @@ opts.parse
 
 branches << `git name-rev --name-only HEAD`.chomp if branches.empty?
 
-def get_sent(name, v)
-  ref = 'refs/sent/%s/v%d' % [name, v]
+def get_sent(name, v, extra=nil)
+  ref = 'refs/sent/%s/v%d%s' % [name, v, extra]
   system('git', 'rev-parse', '-q', '--verify', ref, err: File::NULL, out: File::NULL) ? ref : nil
 end
 
@@ -206,13 +206,15 @@ branches.each do |name|
 
   branch.edit
   branch.parse
-  previous = nil
+  previous_rev = nil
 
   if branch.version
     if get_sent(name, branch.version)
       die "Already sent v%d" % branch.version
     end
     previous = get_sent(name, branch.version - 1)
+    previous_tail = get_sent(name, branch.version - 1, '-tail')
+    previous_rev = "#{previous_tail}..#{previous}" if previous and previous_tail
   end
 
   extra = []
@@ -223,7 +225,7 @@ branches.each do |name|
     extra << "--reroll-count=#{branch.version}" if branch.version
   end
   extra << "--notes"
-  extra << "--range-diff=#{previous}" if previous
+  extra << "--range-diff=#{previous_rev}" if previous_rev
 
   FileUtils.rm_rf(branch.id)
   system('git', 'format-patch', '--quiet', '--cover-letter', '-C', '-D', '-o', branch.id, *extra, "^#{name}@{upstream}", name)
@@ -264,6 +266,8 @@ branches.each do |name|
 
   system('git', 'update-ref', '-m', 'sent version',
          'refs/sent/%s/v%d' % [name, branch.version], name)
+  system('git', 'update-ref', '-m', 'sent version tail',
+         'refs/sent/%s/v%d-tail' % [name, branch.version], "#{name}@{upstream}")
 
   branch['mid'] = mid
   branch.store
