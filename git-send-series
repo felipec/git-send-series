@@ -11,6 +11,7 @@ $base_dir = File.join($git_dir, 'series')
 $edit = false
 $dry_run = false
 $show_cover = false
+$show_range_diff = false
 
 $template = <<EOF
 version:
@@ -187,6 +188,10 @@ opts.on('s', 'show', 'Show cover-letter before sending') do |v|
   $show_cover = true
 end
 
+opts.on('r', 'range-diff', 'Show range-diff since previous version') do |v|
+  $show_range_diff = true
+end
+
 opts.parse
 
 branches << `git name-rev --name-only HEAD`.chomp if branches.empty?
@@ -204,7 +209,7 @@ branches.each do |name|
     next
   end
 
-  branch.edit
+  branch.edit unless $show_range_diff
   branch.parse
   previous_rev = nil
 
@@ -217,6 +222,12 @@ branches.each do |name|
     previous = get_sent(name, branch.version - 1)
     previous_tail = get_sent(name, branch.version - 1, '-tail')
     previous_rev = "#{previous_tail}..#{previous}" if previous and previous_tail
+  end
+
+  if $show_range_diff
+    die 'No previous range found for v%d' % [branch.version - 1] unless previous_rev
+    system('git', 'range-diff', previous_rev, rev)
+    next
   end
 
   extra = []
