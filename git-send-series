@@ -263,7 +263,7 @@ branches.each do |name|
   branch.version ||= 1
 
   system('git', 'update-ref', '-m', 'sent version',
-         'refs/sent/%s/v%s' % [name, branch.version], name)
+         'refs/sent/%s/v%d' % [name, branch.version], name)
 
   branch['mid'] = mid
   branch.store
