@@ -10,6 +10,8 @@ test_description='Test basic functionality'
 
 . ./test-lib.sh
 
+EDITOR=true
+
 do_commit () {
 	local filename="$1"
 	echo "${2-$filename}" > "$filename" &&
@@ -86,7 +88,8 @@ test_expect_success 'cancel edit' '
 	EOS
 	chmod +x editor &&
 	test_must_fail env EDITOR=./editor git send-series &&
-	test -s .git/series/topic
+	test -s .git/series/topic &&
+	test_must_fail env EDITOR=false git send-series
 '
 
 test_expect_success 'multiple send' '
