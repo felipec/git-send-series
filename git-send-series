@@ -208,11 +208,11 @@ branches.each do |name|
   branch.parse
   previous = nil
 
-  if branch['version']
-    if get_sent(name, branch['version'])
-      die "Already sent v%d" % branch['version']
+  if branch.version
+    if get_sent(name, branch.version)
+      die "Already sent v%d" % branch.version
     end
-    previous = get_sent(name, branch['version'] - 1)
+    previous = get_sent(name, branch.version - 1)
   end
 
   extra = []
@@ -260,10 +260,10 @@ branches.each do |name|
     end
   end
 
-  branch['version'] ||= 1
+  branch.version ||= 1
 
   system('git', 'update-ref', '-m', 'sent version',
-         'refs/sent/%s/v%s' % [name, branch['version']], name)
+         'refs/sent/%s/v%s' % [name, branch.version], name)
 
   branch['mid'] = mid
   branch.store
