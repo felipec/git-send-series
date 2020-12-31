@@ -32,11 +32,11 @@ test_expect_success 'setup' '
 	git checkout --track -b topic &&
 	do_commit one &&
 	do_commit two &&
-	do_commit three
+	do_commit three &&
+	mkdir -p .git/series/
 '
 
 test_expect_success 'simple send' '
-	mkdir -p .git/series/ &&
 	cat > .git/series/topic <<-\EOF &&
 	version: 1
 
@@ -92,8 +92,6 @@ test_expect_success 'cancel edit' '
 '
 
 test_expect_success 'multiple send' '
-	mkdir -p .git/series/ &&
-
 	cat > .git/series/topic <<-\EOF &&
 	version:
 
