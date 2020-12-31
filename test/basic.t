@@ -36,7 +36,6 @@ test_expect_success 'setup' '
 '
 
 test_expect_success 'simple send' '
-	test_when_finished "rm -f actual" &&
 	mkdir -p .git/series/ &&
 	cat > .git/series/topic <<-\EOF &&
 	version: 1
@@ -45,6 +44,7 @@ test_expect_success 'simple send' '
 
 	Description.
 	EOF
+	> actual &&
 	git send-series &&
 	test_when_finished "git update-ref -d refs/sent/topic/v1" &&
 	cat > expected <<-EOF &&
@@ -57,7 +57,6 @@ test_expect_success 'simple send' '
 '
 
 test_expect_success 'edit and send' '
-	test_when_finished "rm -f actual" &&
 	cat > editor <<-\EOS &&
 		#!/bin/sh
 		cat > "$1" <<EOF
@@ -69,6 +68,7 @@ test_expect_success 'edit and send' '
 		EOF
 	EOS
 	chmod +x editor &&
+	> actual &&
 	EDITOR=./editor git send-series &&
 	test_when_finished "git update-ref -d refs/sent/topic/v2" &&
 	cat > expected <<-EOF &&
@@ -81,7 +81,6 @@ test_expect_success 'edit and send' '
 '
 
 test_expect_success 'cancel edit' '
-	test_when_finished "rm -f actual" &&
 	cat > editor <<-\EOS &&
 		#!/bin/sh
 		> "$1"
@@ -93,7 +92,6 @@ test_expect_success 'cancel edit' '
 '
 
 test_expect_success 'multiple send' '
-	test_when_finished "rm -f actual" &&
 	mkdir -p .git/series/ &&
 
 	cat > .git/series/topic <<-\EOF &&
