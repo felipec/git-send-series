@@ -204,6 +204,10 @@ def get_sent(name, v, extra=nil)
   git_verify(ref) ? ref : nil
 end
 
+def parse_field(field)
+  field.chomp.split(', ')
+end
+
 branches.each do |name|
   branch = Branch.new(name)
 
@@ -264,10 +268,10 @@ branches.each do |name|
   extra += ['--no-annotate']
 
   to = branch['to']
-  extra += to.chomp.split(', ').map { |e| ['--to', e] }.flatten if to
+  extra += parse_field(to).map { |e| ['--to', e] }.flatten if to
 
   cc = branch['cc']
-  extra += cc.chomp.split(', ').map { |e| ['--cc', e] }.flatten if cc
+  extra += parse_field(cc).map { |e| ['--cc', e] }.flatten if cc
 
   patches = Dir.glob("#{branch.id}/*.patch").sort
   mid = nil
