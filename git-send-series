@@ -3,6 +3,7 @@
 require 'fileutils'
 require 'yaml'
 require 'tempfile'
+require 'tmpdir'
 
 branches = ARGV
 
@@ -288,21 +289,20 @@ branches.each do |name|
   extra << "--notes"
   extra << "--range-diff=#{previous_rev}" if previous_rev
 
-  FileUtils.rm_rf(branch.id)
-  system('git', 'format-patch', '--quiet', '--cover-letter', '-C', '-D', '-o', branch.id, *extra, rev)
+  Dir.mktmpdir('git-send-series') do |dir|
+    system('git', 'format-patch', '--quiet', '--cover-letter', '-C', '-D', '-o', dir, *extra, rev)
 
-  Dir.glob("#{branch.id}/*0000-cover-letter.patch").each do |fn|
-    content = File.read(fn)
-    content.gsub!('*** SUBJECT HERE ***', branch.summary)
-    content.gsub!('*** BLURB HERE ***', branch.body.chomp(''))
-    File.write(fn, content)
-    run_editor(fn) if $show_cover
+    Dir.glob("#{dir}/*0000-cover-letter.patch").each do |fn|
+      content = File.read(fn)
+      content.gsub!('*** SUBJECT HERE ***', branch.summary)
+      content.gsub!('*** BLURB HERE ***', branch.body.chomp(''))
+      File.write(fn, content)
+      run_editor(fn) if $show_cover
+    end
+
+    next if $dry_run
+
+    patches = Dir.glob("#{dir}/*.patch").sort
+    send_patches(branch, patches)
   end
-
-  next if $dry_run
-
-  patches = Dir.glob("#{branch.id}/*.patch").sort
-  send_patches(branch, patches)
-
-  FileUtils.rm_rf(branch.id)
 end
