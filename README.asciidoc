@@ -46,5 +46,5 @@ Then standard tools will be used to send the emails: `git format-patch` and
 In the end, a custom ref will be created to save the current state of the
 branch. For example, if you want to see what was the status of your series of
 the branch 'feature-a' in version 2, you can use 'sent/feature-a/v2', for
-example to create an interdiff to see what changed between one version an the
+example to create an interdiff to see what changed between one version and the
 other.
