@@ -40,7 +40,7 @@ end
 
 class Branch
 
-  attr_reader :id, :summary, :body
+  attr_reader :name, :id, :summary, :body
   attr_reader :rfc, :prefix
   attr_reader :file
 
@@ -211,6 +211,40 @@ def parse_field(field)
   field.chomp.split(', ')
 end
 
+def send_patches(branch, patches)
+  extra = []
+  extra += ['--no-annotate']
+
+  to = branch['to']
+  extra += parse_field(to).map { |e| ['--to', e] }.flatten if to
+
+  cc = branch['cc']
+  extra += parse_field(cc).map { |e| ['--cc', e] }.flatten if cc
+
+  mid = nil
+  IO.popen(['git', 'send-email'] + extra + patches) do |io|
+    io.each do |l|
+      case l
+      when /^Subject: (.*)$/
+        puts "Sent #{$1}"
+      when /^Message-Id: <(.*)>$/
+        mid ||= $1
+      end
+    end
+  end
+
+  branch.version ||= 1
+
+  name = branch.name
+  system('git', 'update-ref', '-m', 'sent version',
+         'refs/sent/%s/v%d' % [name, branch.version], name)
+  system('git', 'update-ref', '-m', 'sent version tail',
+         'refs/sent/%s/v%d-tail' % [name, branch.version], "#{name}@{upstream}")
+
+  branch['mid'] = mid
+  branch.store
+end
+
 branches.each do |name|
   branch = Branch.new(name)
 
@@ -267,37 +301,8 @@ branches.each do |name|
 
   next if $dry_run
 
-  extra = []
-  extra += ['--no-annotate']
-
-  to = branch['to']
-  extra += parse_field(to).map { |e| ['--to', e] }.flatten if to
-
-  cc = branch['cc']
-  extra += parse_field(cc).map { |e| ['--cc', e] }.flatten if cc
-
   patches = Dir.glob("#{branch.id}/*.patch").sort
-  mid = nil
-  IO.popen(['git', 'send-email'] + extra + patches) do |io|
-    io.each do |l|
-      case l
-      when /^Subject: (.*)$/
-        puts "Sent #{$1}"
-      when /^Message-Id: <(.*)>$/
-        mid ||= $1
-      end
-    end
-  end
-
-  branch.version ||= 1
-
-  system('git', 'update-ref', '-m', 'sent version',
-         'refs/sent/%s/v%d' % [name, branch.version], name)
-  system('git', 'update-ref', '-m', 'sent version tail',
-         'refs/sent/%s/v%d-tail' % [name, branch.version], "#{name}@{upstream}")
-
-  branch['mid'] = mid
-  branch.store
+  send_patches(branch, patches)
 
   FileUtils.rm_rf(branch.id)
 end
