@@ -22,9 +22,8 @@ Subject
 Content.
 EOF
 
-def die(*args)
-  fmt = args.shift
-  $stderr.printf("fatal: %s\n" % fmt, *args)
+def die(msg)
+  $stderr.puts('fatal: ' + msg)
   exit 128
 end
 
@@ -220,12 +219,12 @@ branches.each do |name|
   rev = "#{name}@{upstream}..#{name}"
 
   if !git_verify("#{name}@{upstream}")
-    die 'No upstream configured for %s' % name
+    die 'no upstream configured for "%s"' % name
   end
 
   if branch.version
     if get_sent(name, branch.version)
-      die "Already sent v%d" % branch.version
+      die 'already sent v%d' % branch.version
     end
     previous = get_sent(name, branch.version - 1)
     previous_tail = get_sent(name, branch.version - 1, '-tail')
@@ -233,7 +232,7 @@ branches.each do |name|
   end
 
   if $show_range_diff
-    die 'No previous range found for v%d' % [branch.version - 1] unless previous_rev
+    die 'no previous range found for v%d' % [branch.version - 1] unless previous_rev
     system('git', 'range-diff', previous_rev, rev)
     next
   end
