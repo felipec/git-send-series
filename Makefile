@@ -1,3 +1,5 @@
+prefix := $(HOME)
+
 all:
 
 test:
@@ -9,4 +11,4 @@ install:
 	install -D -m 755 git-send-series \
 		$(D)$(prefix)/bin/git-send-series
 
-.PHONY: all test
+.PHONY: all test install
