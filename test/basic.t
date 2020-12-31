@@ -125,4 +125,20 @@ test_expect_success 'no upstream error' '
 	test_must_fail git send-series
 '
 
+test_expect_success 'delete' '
+	git checkout -b tmp-topic &&
+	git branch -u master &&
+	cat > .git/series/tmp-topic <<-\EOF &&
+	version:
+
+	Summary
+
+	Description.
+	EOF
+	git send-series -d &&
+	! test -f .git/series/tmp-topic &&
+	git for-each-ref refs/sent/tmp-topic > refs &&
+	! test -s refs
+'
+
 test_done

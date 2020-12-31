@@ -13,6 +13,7 @@ $edit = false
 $dry_run = false
 $show_cover = false
 $show_range_diff = false
+$delete = false
 
 $template = <<EOF
 version:
@@ -64,6 +65,13 @@ class Branch
     exit 1 if @tmp_file.size == 0
     File.write(@file, File.read(@tmp_file))
     @tmp_file.unlink
+  end
+
+  def delete
+    FileUtils.rm(@file, force: true)
+    r, w = IO.pipe
+    spawn('git', 'for-each-ref', '--format=delete %(refname)', "refs/sent/#{@name}/", out: w)
+    spawn('git', 'update-ref', '--stdin', in: r)
   end
 
   def parse
@@ -186,7 +194,7 @@ opts.on('e', 'edit', 'Edit the branch information') do |v|
   $edit = true
 end
 
-opts.on('d', 'dry-run', 'Do a dry run') do |v|
+opts.on(nil, 'dry-run', 'Do a dry run') do |v|
   $dry_run = true
 end
 
@@ -196,6 +204,10 @@ end
 
 opts.on('r', 'range-diff', 'Show range-diff since previous version') do |v|
   $show_range_diff = true
+end
+
+opts.on('d', 'delete', 'Delete all the branch information') do |v|
+  $delete = true
 end
 
 opts.parse
@@ -251,6 +263,11 @@ branches.each do |name|
 
   if $edit
     branch.edit
+    next
+  end
+
+  if $delete
+    branch.delete
     next
   end
 

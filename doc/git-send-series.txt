@@ -10,7 +10,7 @@ SYNOPSIS
 --------
 [verse]
 'git send-series' [options] [<branches>]
-'git send-series' (--edit | --dry-run | --range-diff) [<branches>]
+'git send-series' (--edit | --delete | --dry-run | --range-diff) [<branches>]
 
 DESCRIPTION
 -----------
@@ -27,6 +27,9 @@ OPTIONS
 
 --edit::
 	Edit the branch information. Do not send.
+
+--delete::
+	Delete the branch information.
 
 --dry-run::
 	Do a dry run.
