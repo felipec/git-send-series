@@ -16,6 +16,8 @@ $show_range_diff = false
 $template = <<EOF
 version:
 cc:
+  -
+  -
 
 Subject
 
@@ -205,6 +207,7 @@ def get_sent(name, v, extra=nil)
 end
 
 def parse_field(field)
+  return field if field.kind_of?(Array)
   field.chomp.split(', ')
 end
 

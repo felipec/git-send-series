@@ -9,6 +9,8 @@ template like this:
 ------------
 version:
 cc:
+  -
+  -
 
 Subject
 
@@ -21,6 +23,22 @@ The first part is a YAML document with all optional fields, such as 'version',
 The second part, delimited by a blank line, is the cover letter. The first line
 will be used as the subject of the cover letter email, and the rest as the
 content of the email.
+
+For example:
+
+------------
+version: 2
+to: list@vger.kernel.org
+cc:
+  - Felipe Contreras <felipe.contreras@gmail.com>
+  - Don Draper <don@draper.me>
+
+Fix README
+
+There was a bunch of typos and grammatical errors.
+
+I've separated the fixes in multiple patches.
+------------
 
 Then standard tools will be used to send the emails: `git format-patch` and
 `git send-email`, which you must have configured before using this helper.
