@@ -33,6 +33,10 @@ def run_editor(file)
   exit 1 unless system(*editor, file)
 end
 
+def git_verify(object)
+  system(*%w[git rev-parse -q --verify], object, err: File::NULL, out: File::NULL)
+end
+
 class Branch
 
   attr_reader :id, :summary, :body
@@ -198,7 +202,7 @@ branches << `git name-rev --name-only HEAD`.chomp if branches.empty?
 
 def get_sent(name, v, extra=nil)
   ref = 'refs/sent/%s/v%d%s' % [name, v, extra]
-  system('git', 'rev-parse', '-q', '--verify', ref, err: File::NULL, out: File::NULL) ? ref : nil
+  git_verify(ref) ? ref : nil
 end
 
 branches.each do |name|
