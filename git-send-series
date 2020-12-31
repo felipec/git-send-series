@@ -200,7 +200,7 @@ end
 
 opts.parse
 
-branches << `git name-rev --name-only HEAD`.chomp if branches.empty?
+branches << `git rev-parse --abbrev-ref @`.chomp if branches.empty?
 
 def get_sent(name, v, extra=nil)
   ref = 'refs/sent/%s/v%d%s' % [name, v, extra]
