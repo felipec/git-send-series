@@ -219,6 +219,10 @@ branches.each do |name|
 
   rev = "#{name}@{upstream}..#{name}"
 
+  if !git_verify("#{name}@{upstream}")
+    die 'No upstream configured for %s' % name
+  end
+
   if branch.version
     if get_sent(name, branch.version)
       die "Already sent v%d" % branch.version

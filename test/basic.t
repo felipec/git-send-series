@@ -123,4 +123,10 @@ test_expect_success 'multiple send' '
 	test_cmp expected actual
 '
 
+test_expect_success 'no upstream error' '
+	git checkout -b bad-topic &&
+	test_when_finished "rm -f actual" &&
+	test_must_fail git send-series
+'
+
 test_done
