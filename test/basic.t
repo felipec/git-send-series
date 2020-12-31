@@ -37,6 +37,8 @@ test_expect_success 'setup' '
 '
 
 test_expect_success 'simple send' '
+	test_when_finished "git send-series -d topic" &&
+
 	cat > .git/series/topic <<-\EOF &&
 	version: 1
 
@@ -46,7 +48,6 @@ test_expect_success 'simple send' '
 	EOF
 	> actual &&
 	git send-series &&
-	test_when_finished "git update-ref -d refs/sent/topic/v1" &&
 	cat > expected <<-EOF &&
 	Subject: [PATCH v1 0/3] Summary
 	Subject: [PATCH v1 1/3] one
@@ -57,6 +58,8 @@ test_expect_success 'simple send' '
 '
 
 test_expect_success 'edit and send' '
+	test_when_finished "git send-series -d topic" &&
+
 	cat > editor <<-\EOS &&
 		#!/bin/sh
 		cat > "$1" <<EOF
@@ -70,7 +73,6 @@ test_expect_success 'edit and send' '
 	chmod +x editor &&
 	> actual &&
 	EDITOR=./editor git send-series &&
-	test_when_finished "git update-ref -d refs/sent/topic/v2" &&
 	cat > expected <<-EOF &&
 	Subject: [PATCH v2 0/3] Summary
 	Subject: [PATCH v2 1/3] one
@@ -92,6 +94,8 @@ test_expect_success 'cancel edit' '
 '
 
 test_expect_success 'multiple send' '
+	test_when_finished "git send-series -d topic" &&
+
 	cat > .git/series/topic <<-\EOF &&
 	version:
 
@@ -100,15 +104,12 @@ test_expect_success 'multiple send' '
 	Description.
 	EOF
 	git send-series &&
-	test_when_finished "git update-ref -d refs/sent/topic/v1" &&
-
 	do_commit four &&
 	test_must_fail git send-series &&
 
 	sed -i "s/version: 1/version: 2/" .git/series/topic &&
 	> actual &&
 	git send-series &&
-	test_when_finished "git update-ref -d refs/sent/topic/v2" &&
 	cat > expected <<-EOF &&
 	Subject: [PATCH v2 0/4] Summary
 	Subject: [PATCH v2 1/4] one
@@ -120,6 +121,7 @@ test_expect_success 'multiple send' '
 '
 
 test_expect_success 'no upstream error' '
+	test_when_finished "git send-series -d bad-topic" &&
 	git checkout -b bad-topic &&
 	test_when_finished "rm -f actual" &&
 	test_must_fail git send-series
