@@ -50,7 +50,6 @@ class Branch
     @name = name
     @id = name.tr('/', '-')
     @file = File.expand_path(File.join($base_dir, @id))
-    @tmp_file = nil
   end
 
   def edit
@@ -58,13 +57,13 @@ class Branch
       FileUtils.mkdir_p($base_dir)
       File.write(@file, $template)
     end
-    @tmp_file = Tempfile.new('git-send-series')
-    @tmp_file.write(File.read(@file))
-    @tmp_file.close
-    run_editor(@tmp_file.path)
-    exit 1 if @tmp_file.size == 0
-    File.write(@file, File.read(@tmp_file))
-    @tmp_file.unlink
+    tmp_file = Tempfile.new('git-send-series')
+    tmp_file.write(File.read(@file))
+    tmp_file.close
+    run_editor(tmp_file.path)
+    exit 1 if tmp_file.size == 0
+    File.write(@file, File.read(tmp_file))
+    tmp_file.unlink
   end
 
   def delete
