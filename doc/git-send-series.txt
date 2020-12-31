@@ -1,0 +1,58 @@
+git-send-series(1)
+==================
+
+NAME
+----
+git-send-series - Send a patch series through email
+
+
+SYNOPSIS
+--------
+[verse]
+'git send-series' [options] [<branches>]
+'git send-series' (--edit | --dry-run | --range-diff) [<branches>]
+
+DESCRIPTION
+-----------
+This tool stores all the information needed to send a patch series with
+`git send-email` so you don't have to.
+
+The information stored includes: version, cc list, cover-letter, and the
+actual range of commits.
+
+OPTIONS
+-------
+--show::
+	Show cover-letter before sending.
+
+--edit::
+	Edit the branch information. Do not send.
+
+--dry-run::
+	Do a dry run.
+
+--range-diff::
+	Show the range-diff since the previous version.
+
+EXAMPLES
+--------
+This is an example of the branch file for version 2 of a patch series:
+
+------------
+version: 2
+cc:
+  - Felipe Contreras <felipe.contreras@gmail.com>
+  - Don Draper <don@draper.me>
+
+Fix README
+
+There was a bunch of typos and grammatical errors.
+
+I've separated the fixes in multiple patches.
+------------
+
+The subject is "Fix README" and everything below is the body.
+
+SEE ALSO
+--------
+git-send-email(1), git-format-patch(1)
