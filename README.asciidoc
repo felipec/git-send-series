@@ -49,5 +49,5 @@ the branch 'feature-a' in version 2, you can use 'sent/feature-a/v2', for
 example to create an interdiff to see what changed between one version and the
 other.
 
-By default `git send-email` will attach a range-diff to the cover-letter
+By default `git send-series` will attach a range-diff to the cover-letter
 using the previous version of the series.
