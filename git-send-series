@@ -57,7 +57,7 @@ class Branch
       FileUtils.mkdir_p($base_dir)
       File.write(@file, $template)
     end
-    tmp_file = Tempfile.new('git-send-series')
+    tmp_file = Tempfile.new('git-send-series-info')
     tmp_file.write(File.read(@file))
     tmp_file.close
     run_editor(tmp_file.path)
