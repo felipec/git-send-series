@@ -32,6 +32,7 @@ to: list@vger.kernel.org
 cc:
   - Felipe Contreras <felipe.contreras@gmail.com>
   - Don Draper <don@draper.me>
+  - William G. Connolly <william@connolly.me>
 
 Fix README
 
