@@ -34,7 +34,7 @@ cc:
   - Don Draper <don@draper.me>
   - William G. Connolly <william@connolly.me>
 
-Fix README
+README: bunch of fixes
 
 There was a bunch of typos and grammatical errors.
 
