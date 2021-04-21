@@ -28,6 +28,7 @@ install-doc:
 		$(D)$(mandir)/git-send-series.1
 
 install-vim:
+	install -d -m 755 $(vimdir)
 	cp -aT vim $(vimdir)
 
 .PHONY: all test install install-doc install-vim clean
