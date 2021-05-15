@@ -27,7 +27,8 @@ test_expect_success 'setup' '
 	git init -q &&
 	git config sendemail.to foo@bar.com &&
 	git config sendemail.smtpserver "$HOME"/sendmail &&
-	git config sendemail.confirm never &&
+	git config sendemail.annotate true &&
+	git config sendemail.confirm always &&
 	do_commit base &&
 	git checkout --track -b topic &&
 	do_commit one &&

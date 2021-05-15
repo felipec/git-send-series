@@ -226,6 +226,7 @@ end
 def send_patches(branch, patches)
   extra = []
   extra += ['--no-annotate']
+  extra += ['--confirm=never']
 
   to = branch['to']
   extra += parse_field(to).map { |e| ['--to', e] }.flatten if to
