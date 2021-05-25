@@ -307,7 +307,7 @@ branches.each do |name|
   extra << "--range-diff=#{previous_rev}" if previous_rev
 
   Dir.mktmpdir('git-send-series') do |dir|
-    system('git', 'format-patch', '--quiet', '--cover-letter', '-C', '-D', '-o', dir, *extra, rev)
+    system('git', 'format-patch', '--quiet', '--cover-letter', '-C', '-o', dir, *extra, rev)
 
     Dir.glob("#{dir}/*0000-cover-letter.patch").each do |fn|
       content = File.read(fn)
