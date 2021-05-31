@@ -234,6 +234,8 @@ def send_patches(branch, patches)
   cc = branch['cc']
   extra += parse_field(cc).map { |e| ['--cc', e] }.flatten if cc
 
+  extra << "--in-reply-to=#{branch['in-reply-to']}" if branch['in-reply-to']
+
   mid = nil
   IO.popen(['git', 'send-email'] + extra + patches) do |io|
     io.each do |l|
