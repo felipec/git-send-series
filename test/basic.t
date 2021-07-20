@@ -144,4 +144,30 @@ test_expect_success 'delete' '
 	! test -s refs
 '
 
+test_expect_success 'special versions' '
+	test_when_finished "git send-series -d topic" &&
+
+	git checkout topic &&
+	cat > .git/series/topic <<-\EOF &&
+	version:
+	rfc: true
+	version: 2
+	try: 2
+
+	Summary
+
+	Description.
+	EOF
+	git send-series &&
+
+	cat > expected <<-EOF &&
+	Subject: [RFC PATCH v2 try2 0/4] Summary
+	Subject: [RFC PATCH v2 try2 1/4] one
+	Subject: [RFC PATCH v2 try2 2/4] two
+	Subject: [RFC PATCH v2 try2 3/4] three
+	Subject: [RFC PATCH v2 try2 4/4] four
+	EOF
+	test_cmp expected actual
+'
+
 test_done

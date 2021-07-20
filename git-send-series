@@ -85,8 +85,9 @@ class Branch
 
     @rfc = self['rfc']
     if self['try']
-      prefix = [ @rfc ? 'RFC/PATCH' : 'PATCH' ]
-      prefix << "try" + self['try']
+      prefix = [ @rfc ? 'RFC PATCH' : 'PATCH' ]
+      prefix << 'v%d' % self['version'] if self['version']
+      prefix << 'try%d' % self['try']
       @prefix = prefix.join(' ')
     end
   end
@@ -248,13 +249,15 @@ def send_patches(branch, patches)
     end
   end
 
-  branch.version ||= 1
+  if !branch['try']
+    branch.version ||= 1
 
-  name = branch.name
-  system('git', 'update-ref', '-m', 'sent version',
-         'refs/sent/%s/v%d' % [name, branch.version], name)
-  system('git', 'update-ref', '-m', 'sent version tail',
-         'refs/sent/%s/v%d-tail' % [name, branch.version], "#{name}@{upstream}")
+    name = branch.name
+    system('git', 'update-ref', '-m', 'sent version',
+           'refs/sent/%s/v%d' % [name, branch.version], name)
+    system('git', 'update-ref', '-m', 'sent version tail',
+           'refs/sent/%s/v%d-tail' % [name, branch.version], "#{name}@{upstream}")
+  end
 
   branch['mid'] = mid
   branch.store
@@ -284,16 +287,21 @@ branches.each do |name|
   end
 
   if branch.version
-    if get_sent(name, branch.version)
-      die 'already sent v%d' % branch.version
+    if !branch['try']
+      if get_sent(name, branch.version)
+        die 'already sent v%d' % branch.version
+      end
+      previous_version = branch.version - 1
+    else
+      previous_version = branch.version
     end
-    previous = get_sent(name, branch.version - 1)
-    previous_tail = get_sent(name, branch.version - 1, '-tail')
+    previous = get_sent(name, previous_version)
+    previous_tail = get_sent(name, previous_version, '-tail')
     previous_rev = "#{previous_tail}..#{previous}" if previous and previous_tail
   end
 
   if $show_range_diff
-    die 'no previous range found for v%d' % [branch.version - 1] unless previous_rev
+    die 'no previous range found for v%d' % [previous_version] unless previous_rev
     system('git', 'range-diff', previous_rev, rev)
     next
   end
