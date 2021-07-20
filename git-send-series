@@ -90,6 +90,9 @@ class Branch
       prefix << 'try%d' % self['try']
       @prefix = prefix.join(' ')
     end
+    if self['prefix']
+      @prefix = self['prefix']
+    end
   end
 
   def [](name)
