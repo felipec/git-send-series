@@ -302,7 +302,7 @@ branches.each do |name|
   if branch.prefix
     extra << "--subject-prefix=#{branch.prefix}"
   else
-    extra << "--rfc=#{branch.rfc}" if branch.rfc
+    extra << "--rfc" if branch.rfc
     extra << "--reroll-count=#{branch.version}" if branch.version
   end
   extra << "--notes"
