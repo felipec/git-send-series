@@ -21,7 +21,9 @@ jobs:
         ruby-version: ${{ matrix.ruby-version }}
 
     - name: Install dependencies
-      run: sudo apt-get install -y git-email
+      run: |
+        sudo add-apt-repository "ppa:git-core/ppa" -y
+        sudo apt-get install -y git-email
 
     - name: Run tests
       run: make test
