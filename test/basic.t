@@ -10,6 +10,7 @@ test_description='Test basic functionality'
 
 . ./test-lib.sh
 
+unset GIT_EDITOR
 EDITOR=true
 
 do_commit () {
