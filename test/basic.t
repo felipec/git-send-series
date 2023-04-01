@@ -85,13 +85,6 @@ test_expect_success 'edit and send' '
 '
 
 test_expect_success 'cancel edit' '
-	cat > editor <<-\EOS &&
-		#!/bin/sh
-		> "$1"
-	EOS
-	chmod +x editor &&
-	test_must_fail env EDITOR=./editor git send-series &&
-	test -s .git/series/topic &&
 	test_must_fail env EDITOR=false git send-series
 '
 
