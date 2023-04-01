@@ -9,7 +9,7 @@ all: doc
 doc: doc/git-send-series.1
 
 test:
-	$(MAKE) -C test
+	$(MAKE) -C t
 
 doc/git-send-series.1: doc/git-send-series.txt
 	a2x -d manpage -f manpage $<
