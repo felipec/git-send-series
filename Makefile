@@ -11,7 +11,7 @@ doc: doc/git-send-series.1
 test:
 	$(MAKE) -C t
 
-%.1: %.txt
+%.1: %.adoc
 	asciidoctor -b manpage $<
 
 clean:

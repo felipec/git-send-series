@@ -41,18 +41,18 @@ EXAMPLES
 --------
 This is an example of the branch file for version 2 of a patch series:
 
-------------
+----
 version: 2
 cc:
-  - Felipe Contreras <felipe.contreras@gmail.com>
-  - Don Draper <don@draper.me>
+- Felipe Contreras <felipe.contreras@gmail.com>
+- Don Draper <don@draper.me>
 
 Fix README
 
 There was a bunch of typos and grammatical errors.
 
 I've separated the fixes in multiple patches.
-------------
+----
 
 The subject is "Fix README" and everything below is the body.
 
