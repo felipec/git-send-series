@@ -52,3 +52,15 @@ other.
 
 By default `git send-series` will attach a range-diff to the cover-letter
 using the previous version of the series.
+
+== Installation ==
+
+Install the `parseopt` gem:
+
+----
+% gem install parseopt
+----
+
+Then simply copy the script anywhere in your `$PATH` and make it
+executable, or run `make install` which will install it by default to
+your `~/bin/` directory (make sure it's in your `$PATH`).
