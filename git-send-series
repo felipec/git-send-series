@@ -106,7 +106,7 @@ class Branch
   end
 
   def store
-    header = @data.to_yaml[4..-1]
+    header = YAML.dump(@data)[4..-1]
     File.write(@file, header + "\n" + @cover)
   end
 
