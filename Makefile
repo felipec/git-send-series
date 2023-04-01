@@ -4,31 +4,29 @@ bindir := $(prefix)/bin
 mandir := $(prefix)/share/man/man1
 vimdir := $(prefix)/.vim/pack/filetypes/start/gitsendseries
 
-all: doc
+all:
 
 doc: doc/git-send-series.1
 
 test:
 	$(MAKE) -C t
 
-doc/git-send-series.1: doc/git-send-series.txt
-	a2x -d manpage -f manpage $<
+%.1: %.txt
+	asciidoctor -b manpage $<
 
 clean:
-	$(RM) doc/git-send-series.1
+	$(RM) doc/*.1
 
 D = $(DESTDIR)
 
 install:
-	install -D -m 755 git-send-series \
-		$(D)$(bindir)/git-send-series
+	install -D -m 755 git-send-series $(D)$(bindir)/git-send-series
 
-install-doc:
-	install -D -m 755 doc/git-send-series.1 \
-		$(D)$(mandir)/git-send-series.1
+install-doc: doc
+	install -D -m 644 doc/git-send-series.1 $(D)$(mandir)/git-send-series.1
 
 install-vim:
-	install -d -m 755 $(vimdir)
-	cp -aT vim $(vimdir)
+	install -d -m 755 $(vimdir)/
+	cp -aT vim $(vimdir)/
 
-.PHONY: all test install install-doc install-vim clean
+.PHONY: all doc test install install-doc install-vim clean
